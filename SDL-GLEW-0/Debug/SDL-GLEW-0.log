@@ -1,3 +1,9 @@
 ﻿  Main.cpp
-C:\workspaces\x_window_opengl\Main.cpp(239,17): warning C4305: '+=': truncation from 'double' to 'GLfloat'
+C:\workspaces\x_window_opengl\Main.cpp(85,30): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\workspaces\x_window_opengl\Main.cpp(87,35): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\workspaces\x_window_opengl\Main.cpp(88,30): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\workspaces\x_window_opengl\Main.cpp(93,34): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\workspaces\x_window_opengl\Main.cpp(95,38): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\workspaces\x_window_opengl\Main.cpp(96,38): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+C:\workspaces\x_window_opengl\Main.cpp(98,38): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
   SDL-GLEW-0.vcxproj -> C:\workspaces\x_window_opengl\Debug\SDL-GLEW-0.exe

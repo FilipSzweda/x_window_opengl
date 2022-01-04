@@ -28,38 +28,76 @@ GLfloat fi = 0;
 
 //-------------Atrybuty wierzcholkow------------------------------------------
 
-GLfloat ver_triangle[] = {	//wspolrzedne wierzcholkow trojkata
-	 0.0f,  1.0f, 0.0,
-	 1.0f,  0.0f, 0.0,
-	-1.0f,  0.0f, 0.0
-};
+GLfloat ver_triangle[300];
 
-GLfloat col_triangle[] = {	//kolory wierzcholkow trojkata
-	1.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f
-};
+GLfloat col_triangle[300];
 
 GLfloat ver_rectangle[] = {	//wspolrzedne wierzcholkow prostokata
-	-1.0f, -0.2f, 0.0f,
-	 1.0f, -0.2f, 0.0f,
-	-1.0f, -0.7f, 0.0f,
-	 1.0f, -0.7f, 0.0f
+		0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,
+
+		0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 1.0f,
+		1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f
 };
 
 GLfloat col_rectangle[] = {	//kolory wierzcholkow prostokata
-	0.0f, 0.0f, 1.0f,
-	0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f,
-	0.0f, 1.0f, 0.0f
+		0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 1.0f, 0.0f,
+
+		0.0f, 0.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 0.0f
 };
 
 GLuint elements[] = { //prostokat skladamy z dwoch trojkatow
-	0, 1, 2,		  //indeksy wierzcholkow dla pierwszego trojkata
-	1, 2, 3			  //indeksy wierzcholkow dla drugiego trojkata
+		0, 1, 2,		  
+		1, 2, 3,
+
+		4, 5, 6,
+		5, 6, 7,
+
+		2, 3, 6,
+		3, 6, 7,
+
+		0, 1, 4,
+		1, 4, 5,
+
+		0, 2, 4,
+		2, 4, 6,
+
+		1, 3, 5,
+		3, 5, 7
 };
 
-
+void prepare_cylinder() {
+	for (int i = 0; i <= 36; i++) {
+		int change = 6 * i;
+		double ang = (double)i / 36;
+		col_triangle[change] = 0;
+		col_triangle[change + 1] = 0.5f;
+		col_triangle[change + 2] = ang;
+		col_triangle[change + 3] = 1.0f;
+		col_triangle[change + 4] = 1.0f - ang;
+		col_triangle[change + 5] = ang;
+	}
+	for (int i = 0; i <= 36; i++) {
+		int change = 6 * i;
+		double ang = (double)i / 36 * M_PI * 2;
+		ver_triangle[change] = sin(ang)/2;
+		ver_triangle[change + 1] = 0;
+		ver_triangle[change + 2] = cos(ang)/2;
+		ver_triangle[change + 3] = sin(ang)/2;
+		ver_triangle[change + 4] = 1.0f;
+		ver_triangle[change + 5] = cos(ang)/2;
+	}
+}
 
 //------------- kod zrodlowy shadera wierzcholkow ----------------------------------
 const GLchar* vertexSource =
@@ -133,6 +171,7 @@ int init_shaders()
 
 void create_objects()
 {
+	prepare_cylinder();
 	// generowanie obiektow
 	glGenVertexArrays(2, vao);  // obiekt tablicy wierzcholkow, dla kazdego obiektu mamy jedna tablice
 	glGenBuffers(4, vbo);		// obiekty buforow wierzcholkow, dla kazdego typu atrubutow kazdego obiektu mamy jeden bufor (np. bufor dla kolorow prostok¹ta, bufor dla wspolrzednych prostok¹ta itd.)
@@ -201,9 +240,9 @@ int main(int argc, char** argv)
 
 	create_objects();
 
-	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //macierz widoku (okresla polozenie kamery i kierunek, w ktorym jest skierowana) 
+	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(4.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //macierz widoku (okresla polozenie kamery i kierunek, w ktorym jest skierowana), change y of first to get differen
 
-	glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), 1.0f, 1.0f, 10.0f);		 //macierz rzutowania perspektywicznego
+	projectionMatrix = glm::perspective(glm::radians(45.0f), 1.0f, 1.0f, 10.0f);		 //macierz rzutowania perspektywicznego
 	glm::mat4 translationMatrix;
 	glm::mat4 rotationMatrix;
 	glm::mat4 transformMatrix;
@@ -230,13 +269,41 @@ int main(int argc, char** argv)
 		transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix;				// wynikowa macierz transformacji
 		glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix));	// zapisanie macierzy wejœciowej dla shadera wierzcholkow
 
-		glBindVertexArray(vao[0]);
-		glDrawArrays(GL_TRIANGLES, 0, 3);	//rysujemy trojkat
+		//glBindVertexArray(vao[0]);
+		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 300);
 
-		glBindVertexArray(vao[1]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);	//rysujemy prostokat
+		//glBindVertexArray(vao[1]);
+		//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);	//rysujemy prostokat
 
-		angle += -0.05;
+		int rows = 4;
+		int columns = 6;
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < columns; j++) {
+				translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(2*float(j), -2 * float(i), 0.0f));
+				transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix;
+				glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix));
+				glBindVertexArray(vao[1]);
+				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+				if (i != rows - 1) {
+					translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(2.5 * float(j), -2 * (float(i) + 0.5), 0.0f));
+					transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix;
+					glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix));
+					glBindVertexArray(vao[0]);
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, 300);
+				}
+
+				//rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(GLfloat(90)), glm::vec3(0.0f, 0.0f, 1.0f));
+				translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(2 * (float(j) + 0.75), -2 * float(i), 0.0f));
+				transformMatrix = projectionMatrix * viewMatrix * translationMatrix * rotationMatrix;
+				glUniformMatrix4fv(transformMatrixUniformLocation, 1, GL_FALSE, glm::value_ptr(transformMatrix));
+				glBindVertexArray(vao[0]);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 300);
+				//rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(GLfloat(-90)), glm::vec3(0.0f, 0.0f, 1.0f));
+			}
+		}
+
+		//angle += 0.1;
 		SDL_GL_SwapWindow(window);
 	}
 
